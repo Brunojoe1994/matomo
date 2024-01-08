@@ -1277,7 +1277,6 @@ Plugins[] = UserLanguage
 Plugins[] = DevicesDetection
 Plugins[] = Goals
 Plugins[] = Ecommerce
-Plugins[] = SEO
 Plugins[] = Events
 Plugins[] = UserCountry
 Plugins[] = GeoIp2
