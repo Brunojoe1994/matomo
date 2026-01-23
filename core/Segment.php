@@ -426,10 +426,28 @@ class Segment
         $sqlName = $segmentObject ? $segmentObject->getSqlSegment() : null;
 
         $joinTable = null;
+        // For page title/URL segments, empty values indicate "not defined". Joining log_action and applying
+        // the type discriminator would filter out NULL idaction rows, so we intentionally skip the join
+        // for NULL/NOT NULL operators to allow matching "not defined" rows.
+        $segmentsAllowNullWithoutJoin = [
+            'pageTitle',
+            'pageUrl',
+            'entryPageTitle',
+            'exitPageTitle',
+            'entryPageUrl',
+            'exitPageUrl',
+        ];
         if (
             $segmentObject
             && $segmentObject->dimension
             && $segmentObject->dimension->getDbColumnJoin()
+            && !(
+                in_array($name, $segmentsAllowNullWithoutJoin, true)
+                && (
+                    $matchType === SegmentExpression::MATCH_IS_NULL_OR_EMPTY
+                    || $matchType === SegmentExpression::MATCH_IS_NOT_NULL_NOR_EMPTY
+                )
+            )
         ) {
             $join = $segmentObject->dimension->getDbColumnJoin();
             $dbDiscriminator = $segmentObject->dimension->getDbDiscriminator();

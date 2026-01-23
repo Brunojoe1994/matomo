@@ -806,7 +806,7 @@ class SegmentTest extends IntegrationTestCase
      * join conversion on visit, then actions
      * make sure actions are joined before conversions
      */
-    public function testGetSelectQueryWhenJoinConversionAndActionOnVisitAndPageUrlSet()
+    public function testGetSelectQueryWhenJoinConversionAndActionOnVisitAndPageUrlSet(): void
     {
         $select = 'log_visit.*';
         $from = 'log_visit';
@@ -830,18 +830,74 @@ class SegmentTest extends IntegrationTestCase
                     " . Common::prefixTable('log_visit') . " AS log_visit
                     LEFT JOIN " . Common::prefixTable('log_link_visit_action') . " AS log_link_visit_action ON log_link_visit_action.idvisit = log_visit.idvisit
                     LEFT JOIN " . Common::prefixTable('log_conversion') . " AS log_conversion ON log_conversion.idvisit = log_visit.idvisit
-                    LEFT JOIN " . Common::prefixTable('log_action') . " AS log_action_segment_log_link_visit_actionidaction_url ON log_link_visit_action.idaction_url = log_action_segment_log_link_visit_actionidaction_url.idaction
                 WHERE
                     log_conversion.idgoal = ? AND HOUR(log_visit.visit_last_action_time) = ? AND log_link_visit_action.search_cat = ?
-                    AND ((
-                          log_action_segment_log_link_visit_actionidaction_url.name IS NOT NULL
-                          AND log_action_segment_log_link_visit_actionidaction_url.name <> ''
-                          AND log_action_segment_log_link_visit_actionidaction_url.name <> '0' )
-                          AND log_action_segment_log_link_visit_actionidaction_url.type = '1')
+                    AND (
+                          log_link_visit_action.idaction_url IS NOT NULL
+                          AND log_link_visit_action.idaction_url <> ''
+                          AND log_link_visit_action.idaction_url <> '0' )
                 GROUP BY log_visit.idvisit
                 ORDER BY NULL
                      ) AS log_inner",
             "bind" => array(1, 12, 'Test'));
+
+        $this->assertEquals($this->removeExtraWhiteSpaces($expected), $this->removeExtraWhiteSpaces($query));
+    }
+
+    public function testGetSelectQueryWhenPageTitleIsNullOrEmpty(): void
+    {
+        $select = '*';
+        $from = 'log_link_visit_action';
+        $where = false;
+        $bind = array();
+
+        $segment = 'pageTitle==';
+        $segment = new Segment($segment, $idSites = array());
+
+        $query = $segment->getSelectQuery($select, $from, $where, $bind);
+        $this->assertQueryDoesNotFail($query);
+
+        $expected = array(
+            "sql"  => "
+                SELECT
+                    *
+                FROM
+                    " . Common::prefixTable('log_link_visit_action') . " AS log_link_visit_action
+                WHERE
+                    (log_link_visit_action.idaction_name IS NULL
+                    OR log_link_visit_action.idaction_name = ''
+                    OR log_link_visit_action.idaction_name = '0') ",
+            "bind" => array(),
+        );
+
+        $this->assertEquals($this->removeExtraWhiteSpaces($expected), $this->removeExtraWhiteSpaces($query));
+    }
+
+    public function testGetSelectQueryWhenPageUrlIsNullOrEmpty(): void
+    {
+        $select = '*';
+        $from = 'log_link_visit_action';
+        $where = false;
+        $bind = array();
+
+        $segment = 'pageUrl==';
+        $segment = new Segment($segment, $idSites = array());
+
+        $query = $segment->getSelectQuery($select, $from, $where, $bind);
+        $this->assertQueryDoesNotFail($query);
+
+        $expected = array(
+            "sql"  => "
+                SELECT
+                    *
+                FROM
+                    " . Common::prefixTable('log_link_visit_action') . " AS log_link_visit_action
+                WHERE
+                    (log_link_visit_action.idaction_url IS NULL
+                    OR log_link_visit_action.idaction_url = ''
+                    OR log_link_visit_action.idaction_url = '0') ",
+            "bind" => array(),
+        );
 
         $this->assertEquals($this->removeExtraWhiteSpaces($expected), $this->removeExtraWhiteSpaces($query));
     }
