@@ -185,6 +185,11 @@ PageRenderer.prototype.jQuery = async function (selector, options = {}) {
 };
 
 PageRenderer.prototype.screenshotSelector = async function (selector) {
+    let options = {};
+    if (arguments.length > 1 && arguments[1] && typeof arguments[1] === 'object') {
+        options = arguments[1];
+    }
+
     await this.waitForFunction(() => !! window.$, { timeout: 60000 });
 
     const result = await this.webpage.evaluate(function (selector) {
@@ -261,6 +266,7 @@ PageRenderer.prototype.screenshotSelector = async function (selector) {
     }
 
     return await this.screenshot({
+        preserveInteractionState: !!options.preserveInteractionState,
         clip: {
             x: result.left,
             y: result.top,
@@ -268,6 +274,14 @@ PageRenderer.prototype.screenshotSelector = async function (selector) {
             height: result.height,
         },
     });
+};
+
+PageRenderer.prototype._prepareForScreenshot = async function (preserveInteractionState) {
+    if (preserveInteractionState) {
+        return;
+    }
+
+    await this.webpage.mouse.move(0, 0);
 };
 
 PAGE_METHODS_TO_PROXY.forEach(function (methodName) {
@@ -292,6 +306,10 @@ PAGE_METHODS_TO_PROXY.forEach(function (methodName) {
 
         let result;
         if (methodName === 'screenshot') {
+            const screenshotOptions = (args[0] && typeof args[0] === 'object') ? { ...args[0] } : {};
+            const preserveInteractionState = !!screenshotOptions.preserveInteractionState;
+            delete screenshotOptions.preserveInteractionState;
+
             // change viewport to entire page before screenshot
             result = this.webpage.waitForFunction(() => !! document.documentElement)
                 .then(() => {
@@ -302,7 +320,9 @@ PAGE_METHODS_TO_PROXY.forEach(function (methodName) {
                 }).then((dims) => {
                     return this.webpage.setViewport(JSON.parse(dims));
                 }).then(() => {
-                    return this.webpage[methodName](...args);
+                    return this._prepareForScreenshot(preserveInteractionState);
+                }).then(() => {
+                    return this.webpage[methodName](screenshotOptions);
                 });
         } else {
             result = this.webpage[methodName](...args);
