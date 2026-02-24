@@ -75,7 +75,7 @@ jobs:
           - php: '8.5'
             adapter: 'MYSQLI'
             mysql-engine: 'Mysql'
-            mysql-version: '8.0'
+            mysql-version: '8.4'
     steps:
       - uses: actions/checkout@v6
         with:
