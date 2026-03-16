@@ -65,12 +65,12 @@ class Live extends \Piwik\Plugin
         $featureFlagManager = StaticContainer::get(FeatureFlagManager::class);
         if ($featureFlagManager->isFeatureActive(PrivacyCompliance::class)) {
             if (VisitorLogDisabledSetting::getInstance()->getValue() === true) {
-                throw new \Exception('Visits log is deactivated globally. A user with super user access can enable this feature in the general settings.');
+                throw new \Exception('Visits log is deactivated globally. A user with superuser access can enable this feature in the general settings.');
             }
         } else {
             $systemSettings = new SystemSettings();
             if ($systemSettings->disableVisitorLog->getValue() === true) {
-                throw new \Exception('Visits log is deactivated globally. A user with super user access can enable this feature in the general settings.');
+                throw new \Exception('Visits log is deactivated globally. A user with superuser access can enable this feature in the general settings.');
             }
         }
 
@@ -124,7 +124,7 @@ class Live extends \Piwik\Plugin
         $systemSettings = new SystemSettings();
 
         if ($systemSettings->disableVisitorProfile->getValue() === true) {
-            throw new \Exception('Visitor profile is deactivated globally. A user with super user access can enable this feature in the general settings.');
+            throw new \Exception('Visitor profile is deactivated globally. A user with superuser access can enable this feature in the general settings.');
         }
 
         if (empty($idSite)) {

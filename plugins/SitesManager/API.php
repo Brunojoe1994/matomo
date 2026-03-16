@@ -322,7 +322,7 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
-     * Returns all websites, requires Super User access
+     * Returns all websites, requires Superuser access
      *
      * @return array The list of websites, indexed by idsite
      */
@@ -344,7 +344,7 @@ class API extends \Piwik\Plugin\API
 
     /**
      * Returns the list of all the website IDs registered.
-     * Requires Super User access.
+     * Requires Superuser access.
      *
      * @return array The list of website IDs
      */
@@ -449,7 +449,7 @@ class API extends \Piwik\Plugin\API
      * Returns the messages to warn users on site deletion.
      *
      * @return array messages to warn users
-     * @throws Exception if the website ID doesn't exist or the user doesn't have super user access to it
+     * @throws Exception if the website ID doesn't exist or the user doesn't have superuser access to it
      * @internal
      * @unsanitized
      */
@@ -487,7 +487,7 @@ class API extends \Piwik\Plugin\API
      * For the superUser it returns all the websites in the database.
      *
      * @param bool|int $limit Specify max number of sites to return
-     * @param bool|string $_restrictSitesToLogin Hack necessary when running scheduled tasks, where "Super User" is forced, but sometimes not desired, see #3017
+     * @param bool|string $_restrictSitesToLogin Hack necessary when running scheduled tasks, where "Superuser" is forced, but sometimes not desired, see #3017
      * @return array array for each site, an array of information (idsite, name, main_url, etc.)
      */
     public function getSitesWithAtLeastViewAccess($limit = false, $_restrictSitesToLogin = false)
@@ -548,7 +548,7 @@ class API extends \Piwik\Plugin\API
 
         if (
             !empty($_restrictSitesToLogin)
-            // Only Super User or logged in user can see viewable sites for a specific login,
+            // Only Superuser or logged in user can see viewable sites for a specific login,
             // but during scheduled task execution, we sometimes want to restrict sites to
             // a different login than the superuser.
             && (Piwik::hasUserSuperUserAccessOrIsTheUser($_restrictSitesToLogin)
@@ -677,7 +677,7 @@ class API extends \Piwik\Plugin\API
 
     /**
      * Add a website.
-     * Requires Super User access.
+     * Requires Superuser access.
      *
      * The website is defined by a name and an array of URLs.
      * @param string $siteName Site name
@@ -699,12 +699,12 @@ class API extends \Piwik\Plugin\API
      * @param int $keepURLFragments If 1, URL fragments will be kept when tracking. If 2, they
      *                              will be removed. If 0, the default global behavior will be used.
      * @param array|null $settingValues JSON serialized settings eg {settingName: settingValue, ...}
-     * @see getKeepURLFragmentsGlobal.
      * @param string $type The website type, defaults to "website" if not set.
      * @param bool|null $excludeUnknownUrls Track only URL matching one of website URLs
      * @param string|null $excludedReferrers Comma separated list of hosts/urls to exclude from referrer detection
      *
      * @return int the website ID created
+     * @see getKeepURLFragmentsGlobal.
      */
     public function addSite(
         $siteName,
@@ -895,7 +895,7 @@ class API extends \Piwik\Plugin\API
      * data. However, it does not delete any logs or archives that belong to this website. You can delete logs and
      * archives for a site manually as described in this FAQ: https://matomo.org/faq/how-to/faq_73/ .
      *
-     * Requires Super User access.
+     * Requires Superuser access.
      *
      * @param string $passwordConfirmation the current user's password, only required when the request is authenticated with session token auth
      * @throws Exception
