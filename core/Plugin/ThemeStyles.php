@@ -156,7 +156,7 @@ class ThemeStyles
     /**
      * @var string
      */
-    public $colorBackgroundBase = '#eff0f1';
+    public $colorBackgroundBase = '#F5F5F5';
 
     /**
      * @var string
